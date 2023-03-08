@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        html, body{
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container{
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-box{
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 0px 10px 10px 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h3>Library Book Borrowing</h3>
+            <div>
+                <label>First Name</label><br>
+                <input type="text" id="fname">
+                <br><br>
+                <label>Last Name</label><br>
+                <input type="text" id="lname">
+                <br><br>
+                <label>Book Title</label><br>
+                <select name="book" id="books">
+                </select>
+                <br><br>
+                <label>Duration (days)</label><br>
+                <input type="text" inputmode="numeric" id="duration">
+                <br><br>
+                <button type="submit" id="btnBorrowFormSubmit">Submit</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            getOption();
+        });
+        function getOption(){
+            $.ajax({
+                url: '/books',
+                type: 'get',
+                dataType: 'json',
+                success: function(response){
+                    var optionString;
+                    for(let i=0;i<response.length;i++){
+                        optionString = optionString +
+                            "<option value=\""+
+                            response[i]['id']+"\">"+
+                            response[i]['title']+"</option>";
+                    }
+                    $("#books").append(optionString);
+                },
+                error: function(response){
+                    console.log(response);
+                    console.log('error');
+                }
+            });
+        }
+
+        $('#btnBorrowFormSubmit').click(function(){
+            $.ajax({
+                url: '/submit',
+                type: 'post',
+                data:{
+                    fname: $('#fname').val(),
+                    lname: $('#lname').val(),
+                    bookId: $('#books').val(),
+                    duration: $('#duration').val()
+                },
+                dataType: 'json',
+                success: function(response){
+                    if(response['status']==200){
+                        $('#fname').val("");
+                        $('#lname').val("");
+                        $('#books').val(1);
+                        $('#duration').val("");
+                        alert(response['message']);
+                    }else{
+                        alert(response['message']);
+                    }
+                },
+                error: function(response){
+                    alert("ups, please check your input!");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

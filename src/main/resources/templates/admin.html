@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        html, body{
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        table, td, th{
+            border: 1px solid;
+        }
+
+        .container{
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .form-box{
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 0px 10px 10px 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <button id="downloadReport-button">Export PDF</button>
+        <div id="content">
+            <h1>Report</h1>
+            <h3>Transaction Data (this month)</h3>
+            <table id="borrowList-table">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>borrower name</th>
+                        <th>book id</th>
+                        <th>duration</th>
+                        <th>borrow date</th>
+                        <th>expected return date</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                </tbody>
+            </table>
+            <br>
+            <h3>Top Borrowed Book</h3>
+            <table id="topBorrowed-table">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Book Author</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            getReportList();
+            getReportList2()
+        });
+
+        function getReportList(){
+            $.ajax({
+                url: '/report',
+                type: 'get',
+                dataType: 'json',
+                success: function(response){
+                    var tbodyString;
+                    for(let i=0;i<response['data'].length;i++){
+                        tbodyString = tbodyString +
+                            "<tr>"+
+                                "<td>"+response['data'][i][0]+"</td>"+
+                                "<td>"+response['data'][i][1]+"</td>"+
+                                "<td>"+response['data'][i][2]+"</td>"+
+                                "<td>"+response['data'][i][3]+"</td>"+
+                                "<td>"+response['data'][i][4]+"</td>"+
+                                "<td>"+response['data'][i][5]+"</td>"+
+                            "</tr>";
+                    }
+                    $("#borrowList-table tbody").append(tbodyString);
+                },
+                error: function(response){
+                    console.log(response);
+                    console.log('error');
+                }
+            });
+        }
+
+        function getReportList2(){
+            $.ajax({
+                url: '/report2',
+                type: 'get',
+                dataType: 'json',
+                success: function(response){
+                    var tbodyString;
+                    for(let i=0;i<response['data'].length;i++){
+                        tbodyString = tbodyString +
+                            "<tr>"+
+                                "<td>"+response['data'][i][0]+"</td>"+
+                                "<td>"+response['data'][i][1]+"</td>"+
+                                "<td>"+response['data'][i][2]+"</td>"+
+                            "</tr>";
+                    }
+                    $("#topBorrowed-table tbody").append(tbodyString);
+                },
+                error: function(response){
+                    console.log(response);
+                    console.log('error');
+                }
+            });
+        }
+
+        $('#downloadReport-button').click(function(){
+            var element = document.getElementById('content');
+            var opt = {
+                margin : 1,
+                filename : 'report.pdf',
+            }
+            html2pdf().set(opt).from(element).save();
+        });
+    </script>
+</body>
+</html>

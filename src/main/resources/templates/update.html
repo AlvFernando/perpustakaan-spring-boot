@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        html, body{
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container{
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .form-box{
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 0px 10px 10px 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h3>Extend Book Borrowing</h3>
+            <div>
+                <label>id</label><br>
+                <input type="text" inputmode="numeric" id="id">
+                <br><br>
+                <label>Additional Days</label><br>
+                <input type="text" inputmode="numeric" id="days">
+                <br><br>
+                <button type="submit" id="btnExtendFormSubmit">Submit</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#btnExtendFormSubmit').click(function(){
+            $.ajax({
+                url: '/update',
+                type: 'put',
+                data:{
+                    id: $('#id').val(),
+                    days: $('#days').val(),
+                },
+                dataType: 'json',
+                success: function(response){
+                    if(response['status']==200){
+                        $('#id').val("");
+                        $('#days').val("");
+                        alert(response['message']);
+                    }else{
+                        alert(response['message']);
+                    }
+                },
+                error: function(response){
+                    alert("ups, please check your input!");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
